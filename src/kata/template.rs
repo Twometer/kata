@@ -1,6 +1,6 @@
 use crate::{
     context::{TemplateContext, TemplateValue},
-    error::ParseError,
+    error::{ParseError, RenderError},
     instr::Instruction,
     scanner::Scanner,
 };
@@ -84,13 +84,17 @@ impl Template {
         Ok(result)
     }
 
-    pub fn render(&self, context: &TemplateContext) -> String {
+    pub fn render(&self, context: &TemplateContext) -> Result<String, RenderError> {
         let mut output = String::new();
-        Self::render_to(&self.instructions, &mut output, context);
-        output
+        Self::render_to(&self.instructions, &mut output, context)?;
+        Ok(output)
     }
 
-    fn render_to(instrs: &Vec<Instruction>, output: &mut String, context: &TemplateContext) {
+    fn render_to(
+        instrs: &Vec<Instruction>,
+        output: &mut String,
+        context: &TemplateContext,
+    ) -> Result<(), RenderError> {
         for instr in instrs {
             match instr {
                 Instruction::Text(str) => {
@@ -119,17 +123,14 @@ impl Template {
                                     cur_val = ctx.get_value(&path_itm);
                                 }
                             }
-                        } else {
-                            panic!("unknown '{}'", path.get(idx).unwrap())
                         }
-
                         idx += 1;
                     }
 
                     if let Some(result) = cur_val {
                         output.push_str(result.as_str())
                     } else {
-                        panic!("failed to resolve {:?}", path);
+                        return Err(RenderError::CannotResolve(path.to_owned()));
                     }
                 }
                 Instruction::ForEach(var_name, collection_key, instrs) => {
@@ -141,7 +142,7 @@ impl Template {
                                 let mut sub_ctx = context.to_owned();
                                 sub_ctx.set_str(var_name.as_str(), obj);
 
-                                Self::render_to(instrs, output, &sub_ctx);
+                                Self::render_to(instrs, output, &sub_ctx)?;
                             }
                         }
                         TemplateValue::ObjectArray(obj_arr) => {
@@ -152,13 +153,15 @@ impl Template {
                                 let mut sub_ctx = context.to_owned();
                                 sub_ctx.set_obj_ref(var_name.as_str(), &obj_ctx);
 
-                                Self::render_to(instrs, output, &sub_ctx);
+                                Self::render_to(instrs, output, &sub_ctx)?;
                             }
                         }
-                        _ => panic!("cannot iterate on {}", collection_key),
+                        _ => return Err(RenderError::CannotIterate(collection_key.to_owned())),
                     }
                 }
             }
         }
+
+        Ok(())
     }
 }

@@ -47,7 +47,7 @@ Search results for '{{ query }}'
     context.set_obj("test_obj", &result_1);
     context.set_str_array("str_arr", &["hello", "world"]);
 
-    let rendered = template.render(&context);
+    let rendered = template.render(&context)?;
     println!("{}", rendered);
 
     Ok(())
