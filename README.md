@@ -9,7 +9,7 @@ mustache-like string templates and supports nested objects and lists.
 Search results for '{{ query }}'
 
 {{ foreach result in results }}
-    - {{ result.name }}
+    - {{ result.name }} at {{ result.url }}
 {{ end }}
 
 ```

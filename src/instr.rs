@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub enum Instruction {
     Text(String),
     Parameter(Vec<String>),
