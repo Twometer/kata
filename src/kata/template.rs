@@ -27,7 +27,9 @@ impl Template {
             let plain_text = scanner.consume_until_str("{{");
             result.push(Instruction::Text(plain_text.to_owned()));
 
-            scanner.consume_exact("{{");
+            if !scanner.consume_exact("{{") {
+                break;
+            }
             scanner.consume_whitespace();
 
             if scanner.consume_exact("foreach") {
