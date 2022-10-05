@@ -2,7 +2,13 @@
 name = "kata"
 version = "0.1.0"
 edition = "2021"
+description = "String templating engine for Rust"
+repository = "https://github.com/Twometer/kata"
+license = "MIT"
+authors = ["Twometer"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "kata"
+path = "src/kata/lib.rs"
 
 [dependencies]

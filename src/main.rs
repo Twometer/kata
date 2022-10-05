@@ -1,14 +1,6 @@
 use std::error::Error;
 
-use context::TemplateObject;
-
-use crate::{context::TemplateContext, template::Template};
-
-mod context;
-mod error;
-mod instr;
-mod scanner;
-mod template;
+use kata::{Template, TemplateContext, TemplateObject};
 
 struct ResultItem {
     name: String,
